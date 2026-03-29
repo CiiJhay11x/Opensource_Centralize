@@ -1,0 +1,510 @@
+#!/bin/bash
+
+##############################################################################
+#  PISONET - COMPLETE DEPLOYMENT GUIDE                                     #
+#  From Fresh Armbian Installation to Fully Operational System              #
+#  Covers: Download, Flash, OS Setup, Dependencies, and PISONET Build       #
+#  Version 7.0.0                                                            #
+##############################################################################
+
+cat << 'EOF'
+
+╔════════════════════════════════════════════════════════════════════════╗
+║                                                                        ║
+║                 🎮 PISONET v7.0.0 COMPLETE DEPLOYMENT                 ║
+║                                                                        ║
+║     From Fresh Armbian 26.2.1 Installation to Full PISONET System      ║
+║                                                                        ║
+║     This guide covers EVERYTHING:                                      ║
+║     • Downloading Armbian image                                        ║
+║     • Flashing to microSD card                                         ║
+║     • Initial Orange Pi setup                                          ║
+║     • System updates & package installation                            ║
+║     • Python installation & virtual environment                        ║
+║     • PISONET server & client setup                                    ║
+║     • Port detection & diagnostics                                     ║
+║     • Admin panel access                                               ║
+║                                                                        ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+════════════════════════════════════════════════════════════════════════════
+PART 1: DOWNLOAD & PREPARE ARMBIAN IMAGE
+════════════════════════════════════════════════════════════════════════════
+
+System Requirements (Your Computer):
+  • 8GB+ free disk space (for image + temp files)
+  • Card reader or USB adapter
+  • Windows, macOS, or Linux
+  • Internet connection
+
+Step 1a: Download Armbian 26.2.1 for Orange Pi One
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ON YOUR COMPUTER:
+
+1. Go to: https://www.armbian.com/download/
+   Or: https://redirect.armbian.com/orangepione/archive
+
+2. Find: Armbian 26.2.1 for Orange Pi One
+   
+3. Download:
+   • File: Armbian_26.2.1_Orangepione_trixie_current_6.12.74_minimal.img.xz
+   • Size: ~200 MB
+   • Save to: ~/Downloads/
+
+4. Verify download (optional but recommended):
+   
+   macOS/Linux:
+   $ cd ~/Downloads
+   $ sha256sum Armbian_26.2.1_Orangepione_trixie_current_6.12.74_minimal.img.xz
+   
+   Compare with SHA256 on Armbian website
+
+Step 1b: Extract the Image
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The downloaded file is compressed (.xz format)
+
+macOS/Linux:
+   $ cd ~/Downloads
+   $ xz -d Armbian_26.2.1_Orangepione_trixie_current_6.12.74_minimal.img.xz
+   
+   (Creates: Armbian_26.2.1_Orangepione_trixie_current_6.12.74_minimal.img)
+
+Windows:
+   • Download 7-Zip: https://www.7-zip.org/
+   • Right-click .xz file → 7-Zip → Extract
+   • Or use WinRAR, PeaZip, or similar
+
+Step 1c: Prepare microSD Card
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+You need:
+  • microSD card (16GB or larger recommended)
+  • Card reader or USB adapter
+  • Flashing tool
+
+Linux (Using dd command):
+   $ lsblk                                    # List disks
+   $ sudo umount /dev/sdX*                    # Unmount if mounted
+   $ sudo dd if=Armbian_26.2.1_*.img of=/dev/sdX bs=4M status=progress
+   $ sync
+
+   ⚠️  IMPORTANT: Replace /dev/sdX with your card device
+   WARNING: Using wrong device will destroy data!
+
+macOS (Using dd command):
+   $ diskutil list                            # List disks
+   $ diskutil unmountDisk /dev/diskX          # Unmount if mounted
+   $ sudo dd if=Armbian_26.2.1_*.img of=/dev/rdiskX bs=4m
+   $ sync
+
+   ⚠️  Note: Use rdiskX (not diskX) for faster flashing
+
+Windows (Using Balena Etcher - Recommended):
+   1. Download: https://www.balena.io/etcher/
+   2. Install and run Etcher
+   3. Select image: Armbian_26.2.1_*.img
+   4. Select drive: Your microSD card
+   5. Click "Flash"
+   6. Wait for completion
+
+👉 After flashing:
+   • Eject microSD card safely
+   • Remove card from reader
+   • Move to next step
+
+════════════════════════════════════════════════════════════════════════════
+PART 2: INITIAL ORANGE PI ONE SETUP
+════════════════════════════════════════════════════════════════════════════
+
+Step 2a: Insert Card & Power On
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Hardware Setup:
+   1. Insert microSD card into Orange Pi One
+   2. Connect Ethernet cable (LAN)
+   3. Connect power (5V 2A)
+   4. Green LED should start blinking
+   5. Wait 30-60 seconds for first boot
+
+Step 2b: Find Your Orange Pi's IP Address
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Method 1: Router Admin Panel
+   1. Go to: http://192.168.1.1 (or your router's IP)
+   2. Login with router credentials
+   3. Find "Connected Devices" or "DHCP Clients"
+   4. Look for "orangepione" or "orangepi-*"
+   5. Note the IP address (e.g., 192.168.1.100)
+
+Method 2: Network Scan (Linux/macOS)
+   $ arp-scan --local | grep -i "orange\|a1:20:a6"
+   
+   Or use: nmap, zenmap, or Advanced IP Scanner
+
+Method 3: Try Common Addresses
+   $ ping 192.168.1.100
+   $ ping 192.168.1.101
+   $ ping 192.168.1.102
+   
+   (When you get a response, that's your Orange Pi)
+
+Step 2c: Connect via SSH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Default credentials:
+   Username: root
+   Password: 1234
+
+Connect:
+   $ ssh root@192.168.1.100
+   
+   (Replace 192.168.1.100 with your Orange Pi's IP)
+
+If prompted:
+   "Are you sure you want to continue connecting? (yes/no)" → Type: yes
+
+After successful login, you should see:
+   root@orangepione:~#
+
+════════════════════════════════════════════════════════════════════════════
+PART 3: SYSTEM UPDATES & PACKAGE INSTALLATION
+════════════════════════════════════════════════════════════════════════════
+
+⚠️  IMPORTANT: Run all these commands ON YOUR ORANGE PI (via SSH)
+
+Step 3a: Update System Package Manager
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   root@orangepione:~# apt-get update
+   root@orangepione:~# apt-get upgrade -y
+
+   (This may take 5-10 minutes, wait for completion)
+
+Step 3b: Install Python 3.11+ and Development Tools
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   root@orangepione:~# apt-get install -y \
+     python3 python3-venv python3-pip python3-dev \
+     build-essential libssl-dev libffi-dev
+
+Verify Python is installed:
+   root@orangepione:~# python3 --version
+   
+   (Should show: Python 3.11.x or higher)
+
+Step 3c: Install System Dependencies
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   root@orangepione:~# apt-get install -y \
+     git curl wget net-tools lsof \
+     nginx supervisor \
+     sqlite3 ufw
+
+Verify key tools:
+   root@orangepione:~# git --version
+   root@orangepione:~# curl --version
+   root@orangepione:~# nginx -v
+
+Step 3d: Install GPIO Libraries (Optional but Recommended)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Needed for coin sensor and relay control:
+
+   root@orangepione:~# apt-get install -y \
+     python3-gpiozero python3-pigpio pigpio
+
+Enable GPIO daemon (if using pigpio):
+   root@orangepione:~# systemctl enable pigpiod
+   root@orangepione:~# systemctl start pigpiod
+
+════════════════════════════════════════════════════════════════════════════
+PART 4: CLONE PISONET & INSTALL
+════════════════════════════════════════════════════════════════════════════
+
+⚠️  Continue on your Orange Pi via SSH
+
+Step 4a: Clone PISONET Repository
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   root@orangepione:~# git clone https://github.com/CiiJhay11x/Opensource_Centralize
+   root@orangepione:~# cd Opensource_Centralize
+   root@orangepione:~/Opensource_Centralize#
+
+Verify files:
+   root@orangepione:~/Opensource_Centralize# ls -la
+   
+   Should show:
+   ✓ setup.sh
+   ✓ server.py
+   ✓ client.py
+   ✓ requirements.txt
+   ✓ templates/admin.html
+
+Step 4b: Make Scripts Executable
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   root@orangepione:~/Opensource_Centralize# chmod +x setup.sh diagnose.sh
+
+Step 4c: Run PISONET Setup Script
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   root@orangepione:~/Opensource_Centralize# sudo ./setup.sh
+
+The script will:
+   ✓ Check system compatibility
+   ✓ RUN PORT DIAGNOSTICS
+   ✓ Install Python dependencies
+   ✓ Create virtual environment
+   ✓ Initialize SQLite database
+   ✓ Configure UFW firewall
+   ✓ Setup Nginx reverse proxy
+   ✓ Create systemd service
+   ✓ Start all services
+   ✓ Run final verification
+   ✓ Display PORT DIAGNOSTICS results
+
+⏱️  Installation takes 5-15 minutes depending on internet speed
+
+════════════════════════════════════════════════════════════════════════════
+PART 5: VERIFY INSTALLATION & ACCESS ADMIN PANEL
+════════════════════════════════════════════════════════════════════════════
+
+Step 5a: Check Services Are Running
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On your Orange Pi:
+   root@orangepione:~# systemctl status pisonet
+   
+   Should show: ● pisonet.service - PISONET - Internet Cafe Management
+                Loaded: loaded
+                Active: active (running)
+
+   root@orangepione:~# systemctl status nginx
+   
+   Should show: ● nginx.service
+                Loaded: loaded
+                Active: active (running)
+
+Step 5b: Verify Ports Are Open
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On your Orange Pi:
+   root@orangepione:~# sudo lsof -i :5000
+   
+   Should show Flask process listening
+
+   root@orangepione:~# sudo lsof -i :80
+   
+   Should show Nginx process listening
+
+Step 5c: Test Connectivity
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On your Orange Pi (local test):
+   root@orangepione:~# curl http://127.0.0.1:5000/
+   
+   Should return HTML page
+
+   root@orangepione:~# curl http://localhost/
+   
+   Should return HTML through Nginx
+
+Step 5d: Access Admin Dashboard
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+From any computer on your network:
+
+1. Open web browser
+2. Go to: http://<your-orange-pi-ip>/admin
+   
+   Example: http://192.168.1.100/admin
+
+3. Login with credentials:
+   Username: root
+   Password: 1234
+
+4. You should see the PISONET Admin Dashboard with:
+   • Active clients count
+   • Total revenue
+   • Client management interface
+   • Real-time statistics
+
+✅ If you see the dashboard, your installation is SUCCESSFUL!
+
+════════════════════════════════════════════════════════════════════════════
+PART 6: TROUBLESHOOTING WITH DIAGNOSTICS
+════════════════════════════════════════════════════════════════════════════
+
+If admin panel doesn't load, run the diagnostic tool:
+
+On your Orange Pi:
+   root@orangepione:~# cd Opensource_Centralize
+   root@orangepione:~/Opensource_Centralize# sudo ./diagnose.sh
+
+This will show:
+   ✓ Port 5000 status (Flask)
+   ✓ Port 80 status (Nginx)
+   ✓ Firewall rules
+   ✓ Process information
+   ✓ Network connectivity
+   ✓ Error logs
+   ✓ Specific fix commands
+
+Common Issues & Fixes:
+
+Issue: Port 5000 not listening
+Fix:   sudo systemctl restart pisonet
+       sudo systemctl status pisonet
+
+Issue: Port 80 blocked by firewall
+Fix:   sudo ufw allow 80/tcp
+       sudo ufw reload
+
+Issue: Connection refused from network
+Fix:   sudo ufw allow 5000/tcp
+       sudo ufw allow 80/tcp
+       sudo ufw reload
+
+Issue: Can't find Orange Pi IP
+Fix:   On Orange Pi: hostname -I
+       Or check router's connected devices list
+
+════════════════════════════════════════════════════════════════════════════
+PART 7: CONFIGURE GPIO (OPTIONAL)
+════════════════════════════════════════════════════════════════════════════
+
+If you're using coin acceptor and relay modules:
+
+Step 7a: Test GPIO Pins
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On your Orange Pi:
+
+Test coin sensor (GPIO 3):
+   root@orangepione:~# python3 -c "
+   import gpiozero
+   pin = gpiozero.Button(3)
+   print('Coin pin ready. Press Ctrl+C to exit.')
+   pin.wait_for_press()
+   print('Coin detected!')
+   "
+
+Test relay (GPIO 5):
+   root@orangepione:~# python3 -c "
+   import gpiozero
+   import time
+   relay = gpiozero.OutputDevice(5)
+   relay.off()
+   time.sleep(1)
+   relay.on()
+   print('Relay test complete')
+   "
+
+Step 7b: Verify in Admin Dashboard
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login to admin dashboard
+2. Check GPIO status section
+3. Verify pins 3 and 5 show correct status
+
+════════════════════════════════════════════════════════════════════════════
+PART 8: SETUP CLIENT MACHINES
+════════════════════════════════════════════════════════════════════════════
+
+After server is running, setup client machines:
+
+Windows Client:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Install Python 3.8+ from https://python.org
+   (Check: "Add Python to PATH")
+
+2. Download client.py from GitHub to client machine
+
+3. Open Command Prompt:
+   > python client.py http://192.168.1.100:5000
+   
+   (Replace 192.168.1.100 with your Orange Pi IP)
+
+4. Client should lock into full-screen mode
+
+Linux Client:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On client machine:
+   $ sudo apt install python3 python3-tk python3-requests
+   $ python3 client.py http://192.168.1.100:5000
+
+════════════════════════════════════════════════════════════════════════════
+PART 9: ONGOING MANAGEMENT
+════════════════════════════════════════════════════════════════════════════
+
+Useful Commands:
+
+Check service status:
+   sudo systemctl status pisonet
+
+View live logs:
+   sudo tail -f /var/log/pisonet/server.log
+
+Restart service:
+   sudo systemctl restart pisonet
+
+Check firewall:
+   sudo ufw status
+
+Run diagnostics:
+   sudo ./diagnose.sh
+
+Change admin password:
+   sqlite3 /opt/pisonet/data/pisonet.db
+   UPDATE config SET value='newpassword' WHERE key='admin_password';
+   .quit
+   sudo systemctl restart pisonet
+
+════════════════════════════════════════════════════════════════════════════
+PART 10: QUICK REFERENCE TABLE
+════════════════════════════════════════════════════════════════════════════
+
+Component              Location/Command
+─────────────────────────────────────────────────────────────────────────
+Admin Dashboard        http://<orange-pi-ip>/admin
+API Status             http://<orange-pi-ip>/api/status
+Flask Server           Port 5000 (internal)
+Nginx Proxy            Port 80 (public access)
+Database               /opt/pisonet/data/pisonet.db
+Logs                   /var/log/pisonet/
+Service Status         sudo systemctl status pisonet
+View Logs              tail -f /var/log/pisonet/server.log
+Run Diagnostics        sudo ./diagnose.sh
+Restart Service        sudo systemctl restart pisonet
+Firewall Status        sudo ufw status
+Open Port              sudo ufw allow <port>/tcp
+Default Username       root
+Default Password       1234
+
+════════════════════════════════════════════════════════════════════════════
+
+✅ YOU'RE DONE!
+
+Your PISONET system is now:
+• Fully installed on fresh Armbian 26.2.1
+• Running with all services active
+• Connected and accessible
+• Port detection working
+• Ready to manage your internet cafe!
+
+Next Steps:
+1. Login to admin dashboard
+2. Configure coin value and rates
+3. Verify GPIO connections (if applicable)
+4. Install clients on user machines
+5. Start earning revenue!
+
+Problems? Run: sudo ./diagnose.sh
+
+Good luck with your PISONET deployment! 🚀
+
+EOF
