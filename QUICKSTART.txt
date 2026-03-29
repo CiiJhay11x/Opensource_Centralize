@@ -1,0 +1,236 @@
+#!/bin/bash
+
+# PISONET - Quick Start & Port Troubleshooting Guide
+# Run this to setup PISONET with automatic port diagnostics
+
+cat << 'EOF'
+
+╔════════════════════════════════════════════════════════════════════════╗
+║                                                                        ║
+║          🎮 PISONET - Internet Cafe Management System 🎮               ║
+║                                                                        ║
+║                     Quick Start Guide                                 ║
+║                     Version 7.0.0                                     ║
+║                                                                        ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+📋 WHAT IS INCLUDED:
+
+✅ Complete Flask server application with GPIO support
+✅ Tkinter-based client with full-screen lock
+✅ Web-based admin dashboard (HTML5/JavaScript)
+✅ SQLite database with transaction logging
+✅ Nginx reverse proxy configuration
+✅ Systemd service for Linux integration
+✅ Automatic port detection & diagnostics
+✅ Firewall configuration (UFW)
+✅ Comprehensive troubleshooting tools
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 FILE GUIDE:
+
+├── setup.sh                - Main installation script (run this!)
+├── diagnose.sh             - Port & connectivity diagnostic tool
+├── server.py               - Flask server application
+├── client.py               - Client lock screen application
+├── requirements.txt        - Python dependencies
+├── pisonet.service         - Systemd service file
+├── templates/
+│   └── admin.html          - Web admin dashboard
+├── README.md               - Full project documentation
+└── INSTALLATION.md         - Detailed setup & troubleshooting
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 INSTALLATION ON YOUR ORANGE PI / LINUX SERVER:
+
+STEP 1: SSH into your Orange Pi or server
+   $ ssh root@192.168.x.x
+      Password: 1234
+
+STEP 2: Clone the repository
+   $ git clone https://github.com/CiiJhay11x/Opensource_Centralize.git
+   $ cd Opensource_Centralize
+
+STEP 3: Run the automated setup script
+   $ sudo chmod +x setup.sh
+   $ sudo ./setup.sh
+
+   The script will:
+   ✓ Detect available ports (5000, 80, 443)
+   ✓ Show what's using those ports
+   ✓ Install all dependencies
+   ✓ Setup Python virtual environment
+   ✓ Initialize database
+   ✓ Configure firewall rules
+   ✓ Setup Nginx reverse proxy
+   ✓ Start services
+   ✓ Display access information
+
+STEP 4: Access admin dashboard
+   After installation completes, open in your browser:
+   → http://<server-ip>/admin
+   
+   Or check server status:
+   → http://<server-ip>/api/status
+
+STEP 5: Login with default credentials
+   Username: root
+   Password: 1234
+   (Change these immediately in production!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 PORT DETECTION & TROUBLESHOOTING:
+
+If the admin panel is not accessible, the setup script automatically
+detects and reports port issues. You can also run the diagnostic tool:
+
+   $ sudo ./diagnose.sh
+
+This will check:
+   ✓ Ports 5000 (Flask), 80 (Nginx), 443 (HTTPS)
+   ✓ What processes are using those ports
+   ✓ Firewall rules and blocked ports
+   ✓ Service status
+   ✓ Network connectivity
+   ✓ Recent error logs
+
+If ports are blocked by firewall, the script provides fix commands:
+   $ sudo ufw allow 5000/tcp
+   $ sudo ufw allow 80/tcp
+   $ sudo ufw reload
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ QUICK DIAGNOSTIC COMMANDS:
+
+Check if Flask is running on port 5000:
+   $ sudo lsof -i :5000
+
+Check if Nginx is running on port 80:
+   $ sudo lsof -i :80
+
+Check all listening ports:
+   $ sudo netstat -tuln | grep LISTEN
+
+View PISONET logs:
+   $ sudo tail -f /var/log/pisonet/server.log
+
+View Nginx errors:
+   $ sudo tail -f /var/log/nginx/error.log
+
+Check service status:
+   $ sudo systemctl status pisonet
+   $ sudo systemctl status nginx
+
+Restart services:
+   $ sudo systemctl restart pisonet
+   $ sudo systemctl restart nginx
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 SECURITY CREDENTIALS:
+
+Current Implementation:
+   Username: root
+   Password: 1234
+
+⚠️  CHANGE IN PRODUCTION:
+
+Connect to database and update:
+   $ sqlite3 /opt/pisonet/data/pisonet.db
+   > UPDATE config SET value='YOUR_NEW_PASSWORD' 
+     WHERE key='admin_password';
+   > .quit
+
+Then restart service:
+   $ sudo systemctl restart pisonet
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 COMMON SCENARIOS:
+
+1️⃣  Admin panel loads but can't add credits
+   → Check firewall rules: sudo ufw status
+   → Restart Flask: sudo systemctl restart pisonet
+
+2️⃣  "Connection refused" error
+   → Check if Flask is running: sudo lsof -i :5000
+   → Check if Nginx is running: sudo lsof -i :80
+   → Run diagnostic: sudo ./diagnose.sh
+
+3️⃣  Can access with localhost but not from another machine
+   → Firewall is blocking port 80
+   → Fix: sudo ufw allow 80/tcp
+   → Reload: sudo ufw reload
+
+4️⃣  Port 5000 or 80 already in use
+   → Find what's using it: sudo lsof -i :5000
+   → Stop the process or change Flask port in server.py
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📱 CLIENT SETUP:
+
+After server is running, setup client machines:
+
+Windows Client:
+   1. Install Python 3.8+ from python.org
+   2. Download client.py to client machine
+   3. Run: python client.py http://<server-ip>:5000
+
+Linux Client:
+   1. Install: sudo apt install python3 python3-tk python3-requests
+   2. Download client.py
+   3. Run: python3 client.py http://<server-ip>:5000
+
+Auto-start on Windows:
+   1. Create scheduled task
+   2. Or add to startup folder
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 AFTER INSTALLATION CHECKLIST:
+
+□ Admin dashboard loads at http://<ip>/admin
+□ Can login with root:1234
+□ Port 5000 (Flask) is listening
+□ Port 80 (Nginx) is listening
+□ Firewall rules allow ports 5000 and 80
+□ Database created at /opt/pisonet/data/pisonet.db
+□ systemctl status shows pisonet: active
+□ Can access from another machine on network
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTATION:
+
+For complete documentation, see:
+
+   README.md           - Project overview & features
+   INSTALLATION.md     - Detailed setup guide with all options
+   diagnose.sh         - Run to check port status and connectivity
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ YOU'RE ALL SET! ✨
+
+Next steps:
+   1. Run setup.sh on your Orange Pi or server
+   2. Access admin dashboard
+   3. Configure GPIO pins for coin/relay
+   4. Setup client machines
+   5. Start earning!
+
+Need help? Run: sudo ./diagnose.sh
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Questions, issues, or suggestions?
+Check INSTALLATION.md for troubleshooting guide.
+
+PISONET v7.0.0 - Making internet cafe management simple and profitable.
+
+EOF

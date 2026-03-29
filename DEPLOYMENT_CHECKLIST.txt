@@ -1,0 +1,264 @@
+#!/bin/bash
+# PISONET Installation Checklist & Reference
+# Copy this to your Orange Pi/Server for quick reference
+
+cat << 'EOF'
+
+╔════════════════════════════════════════════════════════════════════════╗
+║                    ✅ COMPLETE BUILD VERIFICATION                     ║
+║                  PISONET v7.0.0 - Ready for Deployment                 ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+📦 PROJECT BUILD STATUS: ✅ COMPLETE
+
+Total Files: 11
+Total Size: 372 KB (Very lightweight!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 FILES CREATED:
+
+Configuration Files:
+   ✅ requirements.txt          - Python dependencies (6 packages)
+   ✅ pisonet.service           - Systemd service file
+
+Core Applications:
+   ✅ server.py (18 KB)         - Flask server with GPIO & database
+   ✅ client.py (13 KB)         - Tkinter client with lock screen
+   ✅ admin.html (17 KB)        - Web admin dashboard
+
+Installation & Diagnostics:
+   ✅ setup.sh (20 KB)          - Automated installation script
+   ✅ diagnose.sh (13 KB)       - Port detection & diagnostics
+
+Documentation:
+   ✅ README.md                 - Full project documentation
+   ✅ INSTALLATION.md           - Setup & troubleshooting guide
+   ✅ QUICKSTART.txt            - Quick reference
+   ✅ BUILD_SUMMARY.txt         - Build information
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 WHAT TO DO NOW:
+
+STEP 1: Clone to your Orange Pi/Server
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   Method 1: Git Clone (Recommended)
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ git clone https://github.com/CiiJhay11x/Opensource_Centralize │
+   │ $ cd Opensource_Centralize                                      │
+   └────────────────────────────────────────────────────────────────┘
+
+   Method 2: Manual Transfer
+   ┌────────────────────────────────────────────────────────────────┐
+   │ Download ZIP from GitHub                                        │
+   │ Extract to /root/Opensource_Centralize                          │
+   │ $ cd /root/Opensource_Centralize                                │
+   └────────────────────────────────────────────────────────────────┘
+
+STEP 2: Run Installation Script
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ sudo chmod +x setup.sh diagnose.sh                            │
+   │ $ sudo ./setup.sh                                               │
+   └────────────────────────────────────────────────────────────────┘
+
+   This will:
+   ✓ Check root privileges & OS compatibility
+   ✓ Run PORT DIAGNOSTICS (shows open/blocked ports)
+   ✓ Install all dependencies
+   ✓ Setup Python virtual environment
+   ✓ Initialize SQLite database
+   ✓ Configure UFW firewall
+   ✓ Setup Nginx reverse proxy
+   ✓ Create systemd service
+   ✓ Start all services
+   ✓ Run final verification
+   ✓ Show access information
+
+STEP 3: Access Admin Dashboard
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   After installation completes:
+   ┌────────────────────────────────────────────────────────────────┐
+   │ Open browser: http://<server-ip>/admin                          │
+   │ Username: root                                                  │
+   │ Password: 1234                                                  │
+   └────────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 PORT DETECTION - WHAT YOU NEED TO KNOW:
+
+The setup.sh script includes AUTOMATIC PORT DETECTION that:
+
+1. Checks if ports 5000, 80, 443 are available
+2. Identifies any processes blocking those ports
+3. Shows firewall rules and blocked ports
+4. Tests local and network connectivity
+5. Provides automatic fixes for common issues
+6. Reports everything in a clear format
+
+If you get "admin panel unreachable" error:
+
+   Run diagnostic tool:
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ sudo ./diagnose.sh                                            │
+   └────────────────────────────────────────────────────────────────┘
+
+   This will show you EXACTLY what's wrong:
+   ✓ Is Flask listening on 5000?
+   ✓ Is Nginx listening on 80?
+   ✓ Is firewall blocking ports?
+   ✓ Are services running?
+   ✓ Can you connect from network?
+   ✓ What's the exact error?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚑 QUICK TROUBLESHOOTING COMMANDS:
+
+If admin panel is not accessible, try these in order:
+
+1. Check Flask is running:
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ sudo systemctl status pisonet                                 │
+   │ $ sudo lsof -i :5000                                            │
+   └────────────────────────────────────────────────────────────────┘
+
+2. Check Nginx is running:
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ sudo systemctl status nginx                                   │
+   │ $ sudo lsof -i :80                                              │
+   └────────────────────────────────────────────────────────────────┘
+
+3. Check firewall allows those ports:
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ sudo ufw status                                               │
+   │ $ sudo ufw allow 5000/tcp                                       │
+   │ $ sudo ufw allow 80/tcp                                         │
+   │ $ sudo ufw reload                                               │
+   └────────────────────────────────────────────────────────────────┘
+
+4. Restart services:
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ sudo systemctl restart pisonet                                │
+   │ $ sudo systemctl restart nginx                                  │
+   └────────────────────────────────────────────────────────────────┘
+
+5. Test connectivity:
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ curl http://127.0.0.1:5000/api/status      # Local test      │
+   │ $ curl http://localhost/api/status           # Through Nginx   │
+   │ $ curl http://<server-ip>/api/status         # Network test    │
+   └────────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 KEY POINTS TO REMEMBER:
+
+Port 5000 - Flask Server:
+   • This is where your application actually runs
+   • Only on loopback: 127.0.0.1:5000
+   • Must be LISTENING for system to work
+
+Port 80 - Nginx HTTP:
+   • This is what users access from their browsers
+   • Forwards requests to Flask on 5000
+   • Must be LISTENING and OPEN in firewall
+
+Firewall Rules:
+   • Without opening ports in firewall, even if services run, 
+     clients can't reach them from other machines
+   • setup.sh automatically opens ports with UFW
+   • If still blocked, run: sudo ufw allow 80/tcp
+
+Nginx Reverse Proxy:
+   • Acts as middleman between clients and Flask
+   • Listens on port 80
+   • Forwards requests to Flask on 5000
+   • Provides load balancing and caching
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 SECURITY - CHANGE DEFAULT CREDENTIALS:
+
+Current setup uses:
+   Username: root
+   Password: 1234
+
+Change it (REQUIRED for production):
+   ┌────────────────────────────────────────────────────────────────┐
+   │ $ sqlite3 /opt/pisonet/data/pisonet.db                          │
+   │ sqlite> UPDATE config SET value='YOUR_NEW_PASSWORD'             │
+   │         WHERE key='admin_password';                             │
+   │ sqlite> .quit                                                   │
+   │ $ sudo systemctl restart pisonet                                │
+   └────────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 SYSTEM LAYOUT:
+
+Your Setup After Installation:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   /opt/pisonet/
+   ├── server.py              ← Flask application
+   ├── client.py              ← Client application
+   ├── requirements.txt
+   ├── pisonet.service
+   ├── venv/                  ← Python virtual environment
+   ├── data/
+   │   ├── pisonet.db         ← SQLite database
+   │   └── diagnostics.txt    ← Diagnostic report
+   └── templates/
+       └── admin.html         ← Web dashboard
+
+   /var/log/pisonet/
+   ├── server.log             ← Application logs
+   └── error.log              ← Error logs
+
+   /etc/systemd/system/
+   └── pisonet.service        ← Service manager
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ EVERYTHING IS READY!
+
+Your PISONET system includes:
+✅ Complete server application (Flask)
+✅ Admin web dashboard (HTML5)
+✅ Tkinter client with lock screen
+✅ GPIO support for coin/relay
+✅ SQLite database
+✅ Automated installation script
+✅ Port detection & diagnostics
+✅ Firewall auto-configuration
+✅ Systemd service integration
+✅ Complete documentation
+
+You just need to:
+1. Get the files to your Orange Pi/server
+2. Run: sudo ./setup.sh
+3. Access: http://<server-ip>/admin
+4. Start earning!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 FOR MORE INFORMATION:
+
+   • README.md           - Complete project overview
+   • INSTALLATION.md     - Detailed setup instructions
+   • QUICKSTART.txt      - Quick reference guide
+   • diagnose.sh         - Run to check port status
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Questions? Run: sudo ./diagnose.sh
+
+PISONET v7.0.0 - Simple. Secure. Profitable.
+
+EOF

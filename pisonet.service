@@ -1,0 +1,19 @@
+[Unit]
+Description=PISONET - Centralized Internet Cafe Management System
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/pisonet
+Environment="PATH=/opt/pisonet/venv/bin"
+ExecStart=/opt/pisonet/venv/bin/python3 /opt/pisonet/server.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/pisonet/server.log
+StandardError=append:/var/log/pisonet/error.log
+
+[Install]
+WantedBy=multi-user.target
