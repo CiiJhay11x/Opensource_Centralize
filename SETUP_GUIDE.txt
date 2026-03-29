@@ -1,0 +1,287 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║         🚀 PISONET v7.0.0 - COMPLETE & READY FOR DEPLOYMENT                 ║
+║            Fresh OS to Fully Operational System in ~15-20 Minutes            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 WHAT YOU GET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Core Application:
+   • server.py - Flask REST API with GPIO control (559 lines)
+   • client.py - Tkinter full-screen lock application (406 lines)  
+   • admin.html - Professional web dashboard (496 lines)
+
+✅ Automation & Setup:
+   • setup_fresh_os.sh - Complete fresh OS → fully operational (686 lines) ⭐ NEW
+   • setup.sh - Existing system setup with port detection (617 lines)
+   • diagnose.sh - Port/firewall/connectivity diagnostics (341 lines)
+
+✅ Configuration:
+   • pisonet.service - Systemd auto-start service
+   • requirements.txt - All Python dependencies
+   • Nginx reverse proxy configuration
+
+✅ Documentation:
+   • FULL_DEPLOYMENT_GUIDE.txt - Complete step-by-step guide (649 lines) ⭐ NEW
+   • README.md - Project overview & architecture (367 lines)
+   • START_HERE.md - Quick start guide (289 lines)
+   • INSTALLATION.md - Detailed setup (308 lines)
+   • QUICKSTART.txt - 2-minute reference (202 lines)
+   • DEPLOYMENT_CHECKLIST.txt - Step-by-step checklist (312 lines)
+   • BUILD_SUMMARY.txt - Build verification (312 lines)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 QUICK START (5 MINUTES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FOR FRESH ARMBIAN OS INSTALLATION (Recommended - Fully Automated):
+
+Step 1: Prepare microSD Card
+────────────────────────────
+• Download: Armbian_26.2.1_Orangepione_trixie_current_6.12.74_minimal.img
+  From: https://www.armbian.com/download/
+  
+• Flash to microSD using:
+  - Windows: Balena Etcher (https://www.balena.io/etcher/)
+  - macOS: dd command or Apple Pi Baker
+  - Linux: dd or GNOME Disk Utility
+  
+  Command: sudo dd if=image.img of=/dev/sdX bs=4M && sync
+
+Step 2: Boot Orange Pi One
+────────────────────────────
+• Insert microSD into Orange Pi One
+• Connect Ethernet cable
+• Connect 5V power
+• Wait 2-3 minutes for first boot (will customize system)
+
+Step 3: Connect via SSH
+────────────────────────────
+• Find IP: ping orangepione.local
+  OR: Check your router's connected devices
+  OR: Use: arp -a | grep armbian
+  
+• SSH Command: ssh root@<ip>
+  Default Password: 1234
+  
+  Example: ssh root@192.168.1.100
+
+Step 4: Run Automated Setup (One Command!)
+────────────────────────────────────────────
+SSH into Orange Pi and run:
+
+    wget https://github.com/CiiJhay11x/Opensource_Centralize/raw/main/setup_fresh_os.sh
+    chmod +x setup_fresh_os.sh
+    sudo ./setup_fresh_os.sh
+
+This script automatically:
+✓ Updates system (apt-get update/upgrade)
+✓ Installs Python 3.11+
+✓ Installs all dependencies (Git, Nginx, build tools)
+✓ Installs GPIO libraries (gpiozero, pigpio)
+✓ Creates Python virtual environment
+✓ Clones PISONET repository
+✓ Initializes SQLite database
+✓ Configures Systemd service
+✓ Sets up Nginx reverse proxy
+✓ Configures UFW firewall
+✓ Starts all services
+✓ Verifies installation
+✓ Displays access information
+
+Expected time: 10-20 minutes (depending on internet/disk speed)
+
+Step 5: Access Admin Panel
+────────────────────────────
+Wait for setup to complete, then open your browser:
+
+    http://<orange-pi-ip>/admin
+
+Login Credentials:
+    Username: root
+    Password: 1234
+
+Done! System is now fully operational!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 ALTERNATIVE: MANUAL SETUP (Existing System)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+If you already have Linux installed with Git available:
+
+1. Clone repository:
+   $ git clone https://github.com/CiiJhay11x/Opensource_Centralize.git /opt/pisonet
+   $ cd /opt/pisonet
+
+2. Run setup script:
+   $ sudo ./setup.sh
+
+3. Follow prompts and wait for completion
+
+See INSTALLATION.md for detailed manual setup instructions.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+If admin panel is not accessible:
+
+1. Run Diagnostic Tool:
+   $ sudo /opt/pisonet/diagnose.sh
+   
+   This will show:
+   • Which ports are listening (5000, 80, 443)
+   • What processes are using them
+   • Firewall status and rules
+   • Network connectivity
+   • Suggested fixes
+
+2. Check Service Status:
+   $ sudo systemctl status pisonet
+   
+   Should show: Active (running) in green
+
+3. View Error Logs:
+   $ tail -f /var/log/pisonet/server.log
+   OR
+   $ tail -f /var/log/pisonet/error.log
+
+4. Restart Services:
+   $ sudo systemctl restart pisonet
+   $ sudo systemctl restart nginx
+
+5. Check Firewall:
+   $ sudo ufw status
+   
+   Should show ports 22, 80, 5000, 443 ALLOW
+
+6. Test Network:
+   $ curl http://127.0.0.1:5000/api/status
+   Should return: {"status": "online"}
+
+7. Test from Admin Panel Connection:
+   Open http://<ip>/admin → Tools → Test Connection
+   Should show success if server is reachable
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 USEFUL COMMANDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Service Management:
+$ sudo systemctl status pisonet          # Check service status
+$ sudo systemctl start pisonet           # Start service
+$ sudo systemctl stop pisonet            # Stop service
+$ sudo systemctl restart pisonet         # Restart service
+$ sudo systemctl enable pisonet          # Auto-start on boot
+
+View Logs:
+$ tail -f /var/log/pisonet/server.log    # Live server log
+$ tail -f /var/log/pisonet/error.log     # Error log
+$ journalctl -u pisonet -f               # System journal
+
+Port & Diagnostics:
+$ sudo /opt/pisonet/diagnose.sh          # Run diagnostics
+$ sudo lsof -i :5000                     # Check port 5000
+$ sudo lsof -i :80                       # Check port 80
+$ curl http://127.0.0.1:5000/api/status  # Test API
+
+Nginx:
+$ sudo systemctl status nginx            # Check Nginx
+$ sudo nginx -t                          # Test configuration
+$ sudo systemctl restart nginx           # Restart Nginx
+$ curl http://127.0.0.1/admin           # Test web access
+
+System:
+$ df -h                                  # Disk usage
+$ free -h                                # Memory usage
+$ ps aux | grep pisonet                  # Check running processes
+$ top                                    # System monitor
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 KEY FEATURES PROVIDED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Port Detection
+   • Identifies what ports are open/blocked
+   • Detects which process is using each port
+   • Verifies firewall rules
+   • Suggests specific fixes for blocked ports
+   • Integrated into setup_fresh_os.sh during installation
+
+✅ Hardware Control
+   • Coin sensor input on GPIO Pin 3
+   • Relay control on GPIO Pin 5
+   • Automatic GPIO configuration
+   • pigpio daemon for hardware access
+   • gpiozero library for easy control
+
+✅ Network Configuration
+   • Flask server on port 5000 (internal)
+   • Nginx reverse proxy on port 80 (public HTTP)
+   • HTTPS support on port 443 (optional)
+   • UFW firewall auto-configured
+   • All ports properly opened
+
+✅ Admin Dashboard
+   • Real-time statistics and monitoring
+   • Client management interface
+   • Credit system management
+   • System status and logs
+   • Connection testing utilities
+
+✅ Client Application
+   • Full-screen lock on user machines
+   • Real-time credit display and countdown
+   • Admin access via Ctrl+Shift+A
+   • Network error recovery
+   • Cross-platform (Windows/Linux)
+
+✅ Automated Management
+   • Systemd service with auto-restart
+   • Automatic startup on boot
+   • Service logging
+   • Health monitoring
+   • Easy stop/start/restart
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 GETTING MORE HELP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Documentation Files:
+• START_HERE.md - First steps & overview
+• README.md - Project details & features
+• INSTALLATION.md - Detailed setup guide
+• FULL_DEPLOYMENT_GUIDE.txt - Complete step-by-step
+• QUICKSTART.txt - 2-minute reference
+• DEPLOYMENT_CHECKLIST.txt - Step-by-step checklist
+• BUILD_SUMMARY.txt - Build verification
+
+Tools:
+• sudo /opt/pisonet/diagnose.sh - Port diagnostics
+• grep -r "TODO" /opt/pisonet/ - Find incomplete sections
+
+Repository:
+• https://github.com/CiiJhay11x/Opensource_Centralize
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ YOU'RE ALL SET!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PISONET v7.0.0 is complete and ready for deployment!
+
+The setup_fresh_os.sh script handles EVERYTHING from a blank Armbian OS:
+✓ System updates and Python installation
+✓ All dependencies and GPIO libraries  
+✓ PISONET cloning and configuration
+✓ Systemd service setup
+✓ Nginx reverse proxy
+✓ Firewall configuration
+✓ Service verification
+✓ Port diagnostics
+
+Simply run: sudo ./setup_fresh_os.sh
+
+And your PISONET system will be fully operational in 10-20 minutes!
+
+Good luck with your internet cafe business! 🎮💰
